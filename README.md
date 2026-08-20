@@ -6,7 +6,7 @@
 
 > A streamlined, intuitive application designed to help individuals organize their daily tasks, track progress, and boost overall productivity.
 
-## 📖 Overview
+## 📖 Overview 
 
 My Activity Planner App is a personal productivity tool that allows users to seamlessly plan out their days, manage pending activities, and stay on top of deadlines. Built with a focus on user experience and efficiency, this application ensures you never miss an important task.
 
