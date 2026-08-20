@@ -12,10 +12,10 @@ This Pull Request introduces a fully functional Authentication System (Login & R
 *(Note: You can drag and drop screenshots of your new login/register screen here before submitting the PR)*
 
 ## ✅ Review Checklist
-- [x] Code compiles and runs smoothly locally.
-- [x] Tested the registration flow (passwords match, minimum length, duplicate user check).
-- [x] Tested the login flow (valid users, invalid users, admin bypass).
-- [x] README is fully updated.
+- [ ] Code compiles and runs smoothly locally.
+- [ ] Tested the registration flow (passwords match, minimum length, duplicate user check).
+- [ ] Tested the login flow (valid users, invalid users, admin bypass).
+- [ ] README is fully updated.
 
 ## 🔗 Related Issues
 Closes # (Add issue number here if applicable)
