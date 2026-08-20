@@ -5,21 +5,141 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Courses Management Library</title>
     <style>
-        /* Removes all borders and margins, making the app take over the entire screen */
-        body, html { 
-            margin: 0; 
-            padding: 0; 
-            height: 100vh; 
-            width: 100vw; 
-            overflow: hidden; 
-            background-color: #1a202c; /* Matches your login background */
+        /* Base Page Setup */
+        * {
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
         }
-        
-        iframe { 
-            border: none; 
-            width: 100%; 
-            height: 100%; 
-            display: block; 
+
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            width: 100vw;
+            overflow: hidden;
+            background-color: #1a202c;
+        }
+
+        /* --- AUTHENTICATION CONTAINER (LOGIN & REGISTER) --- */
+        #authContainer {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-color: #1a202c;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 10000;
+            padding: 16px;
+        }
+
+        .auth-card {
+            background-color: #ffffff;
+            width: 100%;
+            max-width: 380px;
+            padding: 40px 32px;
+            border-radius: 8px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.35);
+            text-align: center;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        .auth-card h2 {
+            margin: 0 0 28px 0;
+            color: #1a202c;
+            font-size: 24px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+
+        .input-group {
+            margin-bottom: 18px;
+            text-align: left;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 13px 15px;
+            border: 1px solid #dce2e6;
+            border-radius: 6px;
+            font-size: 14px;
+            color: #2d3748;
+            outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        .input-group input::placeholder {
+            color: #a0aec0;
+        }
+
+        .input-group input:focus {
+            border-color: #fbc02d;
+            box-shadow: 0 0 0 3px rgba(251, 192, 45, 0.2);
+        }
+
+        .auth-btn {
+            width: 100%;
+            padding: 13px;
+            background-color: #fbc02d;
+            border: none;
+            border-radius: 6px;
+            font-size: 15px;
+            font-weight: 700;
+            color: #1a202c;
+            cursor: pointer;
+            transition: background-color 0.2s, transform 0.1s;
+            margin-top: 8px;
+        }
+
+        .auth-btn:hover {
+            background-color: #f9a825;
+        }
+
+        .auth-btn:active {
+            transform: scale(0.98);
+        }
+
+        .toggle-text {
+            margin-top: 22px;
+            font-size: 13px;
+            color: #718096;
+        }
+
+        .toggle-text a {
+            color: #d97706;
+            font-weight: 600;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .toggle-text a:hover {
+            text-decoration: underline;
+        }
+
+        .error-message {
+            color: #e53e3e;
+            font-size: 13px;
+            margin-bottom: 14px;
+            display: none;
+            text-align: left;
+            background-color: #fff5f5;
+            padding: 8px 12px;
+            border-radius: 4px;
+            border-left: 3px solid #e53e3e;
+        }
+
+        .success-message {
+            color: #38a169;
+            font-size: 13px;
+            margin-bottom: 14px;
+            display: none;
+            text-align: left;
+            background-color: #f0fff4;
+            padding: 8px 12px;
+            border-radius: 4px;
+            border-left: 3px solid #38a169;
         }
 
         /* --- PRELOADER STYLES --- */
@@ -29,17 +149,17 @@
             left: 0;
             width: 100vw;
             height: 100vh;
-            background-color: #1a202c; /* Seamlessly matches the background */
-            display: flex;
+            background-color: #1a202c;
+            display: none;
             justify-content: center;
             align-items: center;
-            z-index: 9999; /* Ensures it stays on top of the iframe */
-            transition: opacity 0.5s ease; /* Smooth fade-out effect */
+            z-index: 9999;
+            transition: opacity 0.5s ease;
         }
 
         .spinner {
-            border: 4px solid rgba(255, 255, 255, 0.1); /* Subtle dark ring */
-            border-left-color: #fbc02d; /* Matches the yellow login button */
+            border: 4px solid rgba(255, 255, 255, 0.1);
+            border-left-color: #fbc02d;
             border-radius: 50%;
             width: 50px;
             height: 50px;
@@ -50,43 +170,198 @@
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* --- APP IFRAME --- */
+        iframe {
+            border: none;
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
     </style>
 </head>
 <body>
 
+    <!-- AUTHENTICATION FORM (LOGIN & REGISTER) -->
+    <div id="authContainer">
+        <!-- LOGIN FORM -->
+        <div class="auth-card" id="loginCard">
+            <h2>System Login</h2>
+            <div class="error-message" id="loginError"></div>
+            <form id="loginForm" onsubmit="handleLogin(event)">
+                <div class="input-group">
+                    <input type="text" id="loginUsername" placeholder="Username" required autocomplete="username">
+                </div>
+                <div class="input-group">
+                    <input type="password" id="loginPassword" placeholder="Password" required autocomplete="current-password">
+                </div>
+                <button type="submit" class="auth-btn">Log In</button>
+            </form>
+            <div class="toggle-text">
+                Don't have an account? <a onclick="switchToRegister()">Register</a>
+            </div>
+        </div>
+
+        <!-- REGISTER FORM -->
+        <div class="auth-card" id="registerCard" style="display: none;">
+            <h2>System Register</h2>
+            <div class="error-message" id="registerError"></div>
+            <div class="success-message" id="registerSuccess"></div>
+            <form id="registerForm" onsubmit="handleRegister(event)">
+                <div class="input-group">
+                    <input type="text" id="regUsername" placeholder="Choose Username" required autocomplete="username">
+                </div>
+                <div class="input-group">
+                    <input type="password" id="regPassword" placeholder="Password" required autocomplete="new-password">
+                </div>
+                <div class="input-group">
+                    <input type="password" id="regConfirmPassword" placeholder="Confirm Password" required autocomplete="new-password">
+                </div>
+                <button type="submit" class="auth-btn">Create Account</button>
+            </form>
+            <div class="toggle-text">
+                Already have an account? <a onclick="switchToLogin()">Log In</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- PRELOADER SPINNER -->
     <div id="preloader">
         <div class="spinner"></div>
     </div>
 
+    <!-- MAIN APP IFRAME -->
     <iframe id="appFrame" src="about:blank"></iframe>
 
     <script>
-        // 🛑 PASTE YOUR DEPLOYED GOOGLE APPS SCRIPT URL HERE:
-        // Make sure it ends in /exec
+        // PASTE YOUR DEPLOYED GOOGLE APPS SCRIPT URL HERE:
         const webAppUrl = 'https://script.google.com/macros/s/AKfycbzqTXiWZGVMDsOrHsTD_-AqkfAFvsAgR6vb8lrkJLt4NUKX4bAW3I15L0oulWRqp_fzkw/exec';
         
         const iframe = document.getElementById('appFrame');
         const preloader = document.getElementById('preloader');
+        const authContainer = document.getElementById('authContainer');
 
-        // This listens for the iframe to finish loading its initial content
+        // Form switching
+        function switchToRegister() {
+            document.getElementById('loginCard').style.display = 'none';
+            document.getElementById('registerCard').style.display = 'block';
+            clearErrors();
+        }
+
+        function switchToLogin() {
+            document.getElementById('registerCard').style.display = 'none';
+            document.getElementById('loginCard').style.display = 'block';
+            clearErrors();
+        }
+
+        function clearErrors() {
+            document.getElementById('loginError').style.display = 'none';
+            document.getElementById('registerError').style.display = 'none';
+            document.getElementById('registerSuccess').style.display = 'none';
+        }
+
+        // Helper: retrieve registered users list from localStorage
+        function getUsers() {
+            return JSON.parse(localStorage.getItem('planner_app_users') || '[]');
+        }
+
+        // Registration Handler
+        function handleRegister(e) {
+            e.preventDefault();
+            const username = document.getElementById('regUsername').value.trim();
+            const password = document.getElementById('regPassword').value;
+            const confirmPassword = document.getElementById('regConfirmPassword').value;
+            const errorBox = document.getElementById('registerError');
+            const successBox = document.getElementById('registerSuccess');
+
+            errorBox.style.display = 'none';
+            successBox.style.display = 'none';
+
+            if (password.length < 4) {
+                errorBox.textContent = 'Password must be at least 4 characters long.';
+                errorBox.style.display = 'block';
+                return;
+            }
+
+            if (password !== confirmPassword) {
+                errorBox.textContent = 'Passwords do not match.';
+                errorBox.style.display = 'block';
+                return;
+            }
+
+            const users = getUsers();
+            const existingUser = users.find(u => u.username.toLowerCase() === username.toLowerCase());
+
+            if (existingUser) {
+                errorBox.textContent = 'Username already exists. Please choose another.';
+                errorBox.style.display = 'block';
+                return;
+            }
+
+            // Save new user
+            users.push({ username: username, password: password });
+            localStorage.setItem('planner_app_users', JSON.stringify(users));
+
+            successBox.textContent = 'Account created successfully! Redirecting to login...';
+            successBox.style.display = 'block';
+            document.getElementById('registerForm').reset();
+
+            setTimeout(() => {
+                switchToLogin();
+                document.getElementById('loginUsername').value = username;
+            }, 1200);
+        }
+
+        // Login Handler
+        function handleLogin(e) {
+            e.preventDefault();
+            const username = document.getElementById('loginUsername').value.trim();
+            const password = document.getElementById('loginPassword').value;
+            const errorBox = document.getElementById('loginError');
+
+            errorBox.style.display = 'none';
+
+            const users = getUsers();
+            
+            // Allow matching registered users OR default demo credentials
+            const validUser = users.find(u => u.username.toLowerCase() === username.toLowerCase() && u.password === password) ||
+                              (username === 'admin' && password === 'admin');
+
+            if (validUser) {
+                launchApp();
+            } else {
+                errorBox.textContent = 'Invalid username or password.';
+                errorBox.style.display = 'block';
+            }
+        }
+
+        // Launch App and Embed Iframe
+        function launchApp() {
+            // Hide Auth view
+            authContainer.style.display = 'none';
+            
+            // Show Preloader
+            preloader.style.display = 'flex';
+            preloader.style.opacity = '1';
+
+            // Load iframe with parameters
+            iframe.src = webAppUrl + window.location.search;
+        }
+
+        // Handle Iframe Preloader Fade Out
         iframe.onload = () => {
-            // Check if the iframe is no longer on 'about:blank'
             if (iframe.src !== 'about:blank' && iframe.src !== '') {
-                // Fade out the preloader smoothly
                 preloader.style.opacity = '0';
-                
-                // Remove it entirely from the screen so it doesn't block clicks
                 setTimeout(() => {
                     preloader.style.display = 'none';
-                }, 500); // Wait 500ms for the CSS opacity transition to finish
+                }, 500);
             }
         };
-
-        // Loads the app dynamically, passing along any URL parameters
-        window.onload = () => {
-            iframe.src = webAppUrl + window.location.search;
-        };
     </script>
-
 </body>
 </html>
