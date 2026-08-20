@@ -20,4 +20,4 @@ This Pull Request introduces a fully functional Authentication System (Login & R
 ## 🔗 Related Issues
 
 
-Closes # (Add issue number here if applicable)
+Closes # (Add issue number here if applicable).
