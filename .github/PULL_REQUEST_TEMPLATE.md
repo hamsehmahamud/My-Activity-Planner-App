@@ -18,4 +18,6 @@ This Pull Request introduces a fully functional Authentication System (Login & R
 - [ ] README is fully updated.
 
 ## 🔗 Related Issues
-Closes # (Add issue number here if applicable)
+
+
+Closes # (Add issue number here if applicable).
